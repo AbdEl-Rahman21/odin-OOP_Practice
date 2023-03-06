@@ -1,4 +1,3 @@
-require "pry-byebug"
 module Display
   LINES = [
     [1, 2, 3],
@@ -34,10 +33,6 @@ module Display
     puts "\t #{array[6]} | #{array[7]} | #{array[8]} "
   end
 
-  def winner_dec(number)
-    put "Winner is Player ##{number}"
-  end
-
   def get_choice(player)
     loop do
       puts "#{player}, enter your choice: "
@@ -64,9 +59,40 @@ class Game
   end
 
   def play
+    system ("clear")
+
+    counter = 0
+    win = false
+
     create_players
 
-    play_turn(player_1)
+    loop do
+      counter.even? ? play_turn(player_1) : play_turn(player_2)
+
+      winning_combo.each { |combo| win = true if combo.uniq.length == 1 }
+
+      if win
+        create_board(tiles)
+
+        if counter.even?
+          puts "Winner is #{player_1.name}"
+
+          break
+        else
+          puts "Winner is #{player_2.name}"
+
+          break
+        end
+      elsif counter == 8
+        puts "Draw"
+
+        break
+      end
+
+      counter += 1
+    end
+
+    play_again
   end
 
   def create_players
@@ -107,6 +133,14 @@ class Game
     end
 
     system ("clear")
+  end
+
+  def play_again
+    puts "Do you want to play again [Y\N]"
+
+    choice = gets.chomp
+
+    Game.new.play if choice.downcase == "y"
   end
 end
 
