@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Display
   LINES = [
     [1, 2, 3],
@@ -7,25 +9,31 @@ module Display
     [2, 5, 8],
     [3, 6, 9],
     [1, 5, 9],
-    [3, 5, 7],
-  ]
+    [3, 5, 7]
+  ].freeze
 
   def get_player(number)
-    player_info = { name: "", symbol: "" }
+    player_info = { name: '', symbol: '' }
 
     puts "Name of Player ##{number}: "
 
     player_info[:name] = gets.chomp
 
-    puts "Symbol of Player ##{number}: "
+    loop do
+      puts "Symbol of Player ##{number}: "
 
-    player_info[:symbol] = gets.chomp
+      player_info[:symbol] = gets.chomp
 
-    return player_info
+      break unless number == 2 && player_info[:symbol] == player_1.symbol
+
+      puts 'Symbol already picked'
+    end
+
+    player_info
   end
 
   def create_board(array)
-    puts "== Open for business =="
+    puts '== Open for business =='
     puts "\t #{array[0]} | #{array[1]} | #{array[2]} "
     puts "\t---+---+--- "
     puts "\t #{array[3]} | #{array[4]} | #{array[5]} "
@@ -39,11 +47,9 @@ module Display
 
       choice = gets.chomp.to_i
 
-      if ((1..9).include?(choice))
-        return choice
-      else
-        puts "Error: Your choice must be form 1 to 9."
-      end
+      return choice if (1..9).include?(choice)
+
+      puts 'Error: Your choice must be form 1 to 9.'
     end
   end
 end
@@ -59,7 +65,7 @@ class Game
   end
 
   def play
-    system ("clear")
+    system('clear')
 
     counter = 0
     win = false
@@ -77,14 +83,13 @@ class Game
         if counter.even?
           puts "Winner is #{player_1.name}"
 
-          break
         else
           puts "Winner is #{player_2.name}"
 
-          break
         end
+        break
       elsif counter == 8
-        puts "Draw"
+        puts 'Draw'
 
         break
       end
@@ -101,14 +106,14 @@ class Game
     info = get_player(1)
     @player_1 = Players.new(info[:name], info[:symbol])
 
-    system ("clear")
+    system('clear')
 
     create_board(tiles)
 
     info = get_player(2)
     @player_2 = Players.new(info[:name], info[:symbol])
 
-    system ("clear")
+    system('clear')
   end
 
   def play_turn(player)
@@ -117,7 +122,7 @@ class Game
     loop do
       choice = get_choice(player.name)
 
-      if (tiles.include?(choice))
+      if tiles.include?(choice)
         tiles.map! { |tile| tile == choice ? tile = player.symbol : tile }
 
         winning_combo.each do |combo|
@@ -128,19 +133,28 @@ class Game
 
         break
       else
-        puts "Error: Tile already picked."
+        puts 'Error: Tile already picked.'
       end
     end
 
-    system ("clear")
+    system('clear')
   end
 
   def play_again
-    puts "Do you want to play again [Y\N]"
+    loop do
+      puts 'Do you want to play again [Y\\N]'
 
-    choice = gets.chomp
+      choice = gets.chomp.downcase
 
-    Game.new.play if choice.downcase == "y"
+      case choice
+      when 'y'
+        Game.new.play
+      when 'n'
+        return
+      else
+        puts 'Invalid choice'
+      end
+    end
   end
 end
 
